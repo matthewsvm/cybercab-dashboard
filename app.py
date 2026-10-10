@@ -20,7 +20,7 @@ pio.templates["cybercab_dark"] = go.layout.Template(layout=dict(
 ))
 pio.templates.default = "cybercab_dark"
 
-st.set_page_config(page_title="Robotaxi Fleet Tracker", page_icon="assets/favicon.png", layout="wide")
+st.set_page_config(page_title="Texas Robotaxi Fleet Tracker", page_icon="assets/favicon.png", layout="wide")
 
 st.html(f"""
 <style>
@@ -44,7 +44,7 @@ CYBERCAB_SVG = """<svg width="96" height="48" viewBox="0 0 96 48" xmlns="http://
 <circle cx="75" cy="37" r="8" fill="#1E1E22" stroke="#F2F2F2" stroke-width="2.5"/>
 <circle cx="25" cy="37" r="2.5" fill="#E31937"/><circle cx="75" cy="37" r="2.5" fill="#E31937"/>
 </svg>"""
-st.html('<div class="cc-title">' + CYBERCAB_SVG.replace(chr(10), ' ') + '<h1>Robotaxi Fleet Tracker</h1></div>')
+st.html('<div class="cc-title">' + CYBERCAB_SVG.replace(chr(10), ' ') + '<h1>Texas Robotaxi Fleet Tracker</h1></div>')
 st.caption("Tesla Cybercab and Model Y robotaxi counts vs. other operators, from the public Texas DMV AV registry.")
 
 @st.cache_data(ttl=3600)
