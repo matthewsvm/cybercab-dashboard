@@ -67,8 +67,7 @@ date,operator,model,count,operator_total,source,quality
 2026-10-15,Waymo,Jaguar I-PACE,812,1185,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-15,Waymo,Zeekr RT,373,1185,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-15,Tesla Robotaxi,Model Y,420,769,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
-2026-10-15,Tesla Robotaxi,Cybercab,319,769,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
-2026-10-15,Tesla Robotaxi,cybercab,30,769,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-15,Tesla Robotaxi,Cybercab,349,769,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-15,Avride,Hyundai Ioniq 5,344,344,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-15,Zoox,Toyota Highlander,46,63,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-15,Zoox,Zoox,17,63,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
@@ -78,8 +77,7 @@ date,operator,model,count,operator_total,source,quality
 2026-10-16,Waymo,Jaguar I-PACE,812,1185,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-16,Waymo,Zeekr RT,373,1185,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-16,Tesla Robotaxi,Model Y,420,769,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
-2026-10-16,Tesla Robotaxi,Cybercab,319,769,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
-2026-10-16,Tesla Robotaxi,cybercab,30,769,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-16,Tesla Robotaxi,Cybercab,349,769,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-16,Avride,Hyundai Ioniq 5,344,344,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-16,Zoox,Toyota Highlander,46,63,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-16,Zoox,Zoox,17,63,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact

@@ -10,6 +10,23 @@ UA = "cybercab-dashboard/0.1 (+https://github.com/matthewsvm/cybercab-dashboard;
 CSV = Path(__file__).resolve().parent.parent / "data" / "history.csv"
 FIELDS = ["date", "operator", "model", "count", "operator_total", "source", "quality"]
 SOURCE = "fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS)"
+CANON = {"cybercab": "Cybercab", "model y": "Model Y"}
+
+def norm_model(m):
+    m = str(m).strip()
+    return CANON.get(m.lower(), m)
+
+def merge(rows):
+    """Merge rows with the same date/operator/model (case-insensitive), summing counts."""
+    out = {}
+    for r in rows:
+        r = dict(r); r["model"] = norm_model(r["model"])
+        k = (r["date"], r["operator"], r["model"].lower())
+        if k in out:
+            out[k]["count"] = int(out[k]["count"]) + int(r["count"])
+        else:
+            out[k] = r
+    return list(out.values())
 
 def fetch():
     req = urllib.request.Request(URL, headers={"User-Agent": UA, "Accept": "application/json"})
@@ -27,7 +44,8 @@ def main():
     if not new:
         sys.exit("No data returned; leaving file untouched")
     existing = list(csv.DictReader(CSV.open())) if CSV.exists() else []
-    kept = [r for r in existing if r["date"] != today]
+    kept = merge(r for r in existing if r["date"] != today)
+    new = merge(new)
     with CSV.open("w", newline="") as f:
         w = csv.DictWriter(f, FIELDS); w.writeheader(); w.writerows(kept + new)
     print(f"{today}: wrote {len(new)} rows ({len(kept)} older rows kept)")
