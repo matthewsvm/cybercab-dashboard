@@ -154,3 +154,13 @@ date,operator,model,count,operator_total,source,quality
 2026-10-23,Nuro,Lucid Gravity,26,47,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-23,Nuro,Toyota Prius,21,47,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-10-23,May Mobility,Toyota Sienna,22,22,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-24,Waymo,Jaguar I-PACE,812,1207,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-24,Waymo,Zeekr RT,395,1207,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-24,Tesla Robotaxi,Model Y,507,927,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-24,Tesla Robotaxi,Cybercab,420,927,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-24,Avride,Hyundai Ioniq 5,344,344,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-24,Zoox,Toyota Highlander,46,63,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-24,Zoox,Zoox,17,63,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-24,Nuro,Lucid Gravity,26,47,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-24,Nuro,Toyota Prius,21,47,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-10-24,May Mobility,Toyota Sienna,22,22,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
