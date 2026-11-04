@@ -51,7 +51,7 @@ st.caption("Tesla Cybercab and Model Y robotaxi counts vs. other operators, from
 def load():
     df = pd.read_csv("data/history.csv", parse_dates=["date"])
     # Normalize model names case-insensitively (e.g. "cybercab" -> "Cybercab") and merge duplicates
-    canon = {"cybercab": "Cybercab", "model y": "Model Y"}
+    canon = {"cybercab": "Cybercab", "model y": "Model Y", "modey y": "Model Y"}
     df["model"] = df["model"].astype(str).str.strip()
     df["model"] = df["model"].map(lambda m: canon.get(m.lower(), m))
     df = (df.groupby(["date", "operator", "model"], as_index=False, sort=False)

@@ -10,7 +10,7 @@ UA = "cybercab-dashboard/0.1 (+https://github.com/matthewsvm/cybercab-dashboard;
 CSV = Path(__file__).resolve().parent.parent / "data" / "history.csv"
 FIELDS = ["date", "operator", "model", "count", "operator_total", "source", "quality"]
 SOURCE = "fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS)"
-CANON = {"cybercab": "Cybercab", "model y": "Model Y"}
+CANON = {"cybercab": "Cybercab", "model y": "Model Y", "modey y": "Model Y"}
 
 def norm_model(m):
     m = str(m).strip()
