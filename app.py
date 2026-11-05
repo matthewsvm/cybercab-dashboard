@@ -1,8 +1,14 @@
+import sys
+from pathlib import Path
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 import plotly.graph_objects as go
 import plotly.io as pio
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
+from model_rows import resolve_model_rows
 
 RED = "#E31937"
 BG = "#0B0B0D"
@@ -50,10 +56,12 @@ st.caption("Tesla Cybercab and Model Y robotaxi counts vs. other operators, from
 @st.cache_data(ttl=3600)
 def load():
     df = pd.read_csv("data/history.csv", parse_dates=["date"])
-    # Normalize model names case-insensitively (e.g. "cybercab" -> "Cybercab") and merge duplicates
-    canon = {"cybercab": "Cybercab", "model y": "Model Y", "modey y": "Model Y"}
-    df["model"] = df["model"].astype(str).str.strip()
-    df["model"] = df["model"].map(lambda m: canon.get(m.lower(), m))
+    # Canonicalize model names, drop placeholder labels, and reuse the previous
+    # snapshot's counts when the operator total is unchanged.
+    df = pd.DataFrame(resolve_model_rows(df.to_dict("records")))
+    df["date"] = pd.to_datetime(df["date"])
+    df["count"] = pd.to_numeric(df["count"])
+    df["operator_total"] = pd.to_numeric(df["operator_total"])
     df = (df.groupby(["date", "operator", "model"], as_index=False, sort=False)
             .agg({"count": "sum", "operator_total": "first", "source": "first", "quality": "first"}))
     return df
@@ -79,6 +87,9 @@ c[1].metric("Cybercab", int(tesla.loc[tesla["model"] == "Cybercab", "count"].sum
 c[2].metric("Model Y", int(tesla.loc[tesla["model"] == "Model Y", "count"].sum()))
 c[3].metric("All operators", int(ops_total.sum()))
 st.caption(f"Latest data: {latest_date:%b %d, %Y}")
+if (last["quality"] == "carried_forward").any():
+    st.caption("Model counts marked carried forward are the previous snapshot's counts. "
+               "The source had no usable model names that day, and the operator total was unchanged.")
 
 # Tesla over time
 st.subheader("Tesla fleet over time")
@@ -94,7 +105,8 @@ fig.update_xaxes(showgrid=False)
 add_events(fig, latest_date)
 st.plotly_chart(fig, width="stretch")
 st.caption("Early points (Jul 30 – Oct 7) are approximate totals from third-party trackers; "
-           "per-model counts start Oct 9. Daily exact snapshots follow.")
+           "per-model counts start Oct 9. If a later snapshot has no usable model names and the "
+           "operator total is unchanged, that day's model counts are the previous snapshot's.")
 
 # Operators
 st.subheader("Operator comparison")

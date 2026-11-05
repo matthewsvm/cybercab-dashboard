@@ -274,9 +274,13 @@ date,operator,model,count,operator_total,source,quality
 2026-11-04,Nuro,Lucid Gravity,26,47,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-11-04,Nuro,Toyota Prius,21,47,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
 2026-11-04,May Mobility,Toyota Sienna,22,22,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
-2026-11-05,Waymo,Unknown model,1259,1259,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
-2026-11-05,Tesla Robotaxi,Unknown model,1244,1244,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
-2026-11-05,Avride,Unknown model,344,344,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
-2026-11-05,Zoox,Unknown model,63,63,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
-2026-11-05,Nuro,Unknown model,47,47,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
-2026-11-05,May Mobility,Unknown model,22,22,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),exact
+2026-11-05,Waymo,Jaguar I-PACE,863,1259,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),carried_forward
+2026-11-05,Waymo,Zeekr RT,396,1259,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),carried_forward
+2026-11-05,Tesla Robotaxi,Model Y,671,1244,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),carried_forward
+2026-11-05,Tesla Robotaxi,Cybercab,573,1244,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),carried_forward
+2026-11-05,Avride,Hyundai Ioniq 5,344,344,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),carried_forward
+2026-11-05,Zoox,Toyota Highlander,46,63,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),carried_forward
+2026-11-05,Zoox,Zoox,17,63,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),carried_forward
+2026-11-05,Nuro,Lucid Gravity,26,47,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),carried_forward
+2026-11-05,Nuro,Toyota Prius,21,47,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),carried_forward
+2026-11-05,May Mobility,Toyota Sienna,22,22,fsddb.com/robotaxi.json (mirrors TxDMV TxMCCS),carried_forward
