@@ -8,10 +8,17 @@ import streamlit as st
 import plotly.graph_objects as go
 import plotly.io as pio
 
-sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
-from ca_activity import activity_rows, load_document as load_cpuc, sum_activity
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT / "scripts"))
+from ca_activity import PATH as CPUC_PATH
+from ca_activity import activity_rows, load_document as read_cpuc, sum_activity
+from data_signature import file_signature
 from model_rows import resolve_model_rows
-from service_areas import feature_collection, generated_at, load_document as load_areas
+from service_areas import PATH as AREAS_PATH
+from service_areas import feature_collection, generated_at, load_document as read_areas
+
+HISTORY_PATH = ROOT / "data" / "history.csv"
+META_PATH = ROOT / "data" / "source_meta.json"
 
 RED = "#E31937"
 BG = "#0B0B0D"
@@ -56,9 +63,17 @@ CYBERCAB_SVG = """<svg width="96" height="48" viewBox="0 0 96 48" xmlns="http://
 st.html('<div class="cc-title">' + CYBERCAB_SVG.replace(chr(10), ' ') + '<h1>Texas Robotaxi Fleet Tracker</h1></div>')
 st.caption("Tesla Cybercab and Model Y robotaxi counts vs. other operators, from the public Texas DMV AV registry.")
 
+def _require_signature(source_signature):
+    # The tuple is the cache key. Hashing it is what drops a stale frame after
+    # history.csv (or another data file) is replaced without a code edit.
+    if not isinstance(source_signature, tuple) or len(source_signature) != 4:
+        raise TypeError("source_signature must be a file_signature tuple")
+
+
 @st.cache_data(ttl=3600)
-def load():
-    df = pd.read_csv("data/history.csv", parse_dates=["date"])
+def load(path: str, source_signature: tuple):
+    _require_signature(source_signature)
+    df = pd.read_csv(path, parse_dates=["date"])
     # Canonicalize model names, drop placeholder labels, and reuse the previous
     # snapshot's counts when the operator total is unchanged.
     df = pd.DataFrame(resolve_model_rows(df.to_dict("records")))
@@ -69,7 +84,7 @@ def load():
             .agg({"count": "sum", "operator_total": "first", "source": "first", "quality": "first"}))
     return df
 
-df = load()
+df = load(str(HISTORY_PATH), file_signature(HISTORY_PATH))
 latest_date = df["date"].max()
 EVENTS = [("2026-10-21", "Tesla Q3 earnings"), ("2026-10-30", "NHTSA response due")]
 
@@ -140,23 +155,35 @@ if last["source"].astype(str).str.contains("TxMCCS VIN").any():
     st.caption("Per-model counts are VIN prefix counts from the TxDMV TxMCCS registry. "
                "Each operator total is the fsddb fleet size, which matched that VIN census.")
 
-def load_meta():
-    path = Path("data/source_meta.json")
-    if not path.exists():
+@st.cache_data(ttl=3600)
+def load_meta(path: str, source_signature: tuple):
+    _require_signature(source_signature)
+    file = Path(path)
+    if not file.exists():
         return {}
     try:
-        return json.loads(path.read_text())
+        return json.loads(file.read_text())
     except json.JSONDecodeError:
         return {}
 
-meta = load_meta()
+@st.cache_data(ttl=3600)
+def load_areas(path: str, source_signature: tuple):
+    _require_signature(source_signature)
+    return read_areas(path)
+
+@st.cache_data(ttl=3600)
+def load_cpuc_doc(path: str, source_signature: tuple):
+    _require_signature(source_signature)
+    return read_cpuc(path)
+
+meta = load_meta(str(META_PATH), file_signature(META_PATH))
 
 st.divider()
 st.subheader("Service areas")
 st.caption("Cities where Waymo, Tesla, and Zoox publish a service boundary. "
            "These shapes are context for where vehicles operate. They are not vehicle counts "
            "and are separate from the Texas registry totals above.")
-areas_doc = load_areas()
+areas_doc = load_areas(str(AREAS_PATH), file_signature(AREAS_PATH))
 if not areas_doc:
     st.info("Service-area file is not available yet. The daily collector stores data/service-areas.json.")
 else:
@@ -190,7 +217,7 @@ st.subheader("California activity")
 st.caption("Quarterly CPUC passenger-service reports, shown by month. "
            "Trips and vehicle miles are activity, lagged to the filing, not a fleet size. "
            "They are not added to the Texas vehicle totals.")
-cpuc_doc = load_cpuc()
+cpuc_doc = load_cpuc_doc(str(CPUC_PATH), file_signature(CPUC_PATH))
 if not cpuc_doc:
     st.info("California activity file is not available yet. The daily collector stores data/cpuc_activity_monthly.json.")
 else:
