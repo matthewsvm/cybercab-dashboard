@@ -1,3 +1,4 @@
+import json
 import sys
 from pathlib import Path
 
@@ -8,7 +9,9 @@ import plotly.graph_objects as go
 import plotly.io as pio
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
+from ca_activity import activity_rows, load_document as load_cpuc, sum_activity
 from model_rows import resolve_model_rows
+from service_areas import feature_collection, generated_at, load_document as load_areas
 
 RED = "#E31937"
 BG = "#0B0B0D"
@@ -130,10 +133,102 @@ else:
     right.info("Operator trend lines appear once more than one day of data is collected.")
 
 with st.expander("Latest model breakdown / raw data"):
-    st.dataframe(last[["operator", "model", "count", "operator_total"]], hide_index=True)
+    st.dataframe(last[["operator", "model", "count", "operator_total", "quality"]], hide_index=True)
     st.dataframe(df.sort_values("date", ascending=False), hide_index=True)
 
+if last["source"].astype(str).str.contains("TxMCCS VIN").any():
+    st.caption("Per-model counts are VIN prefix counts from the TxDMV TxMCCS registry. "
+               "Each operator total is the fsddb fleet size, which matched that VIN census.")
+
+def load_meta():
+    path = Path("data/source_meta.json")
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return {}
+
+meta = load_meta()
+
 st.divider()
-st.caption("Data: [fsddb.com](https://fsddb.com/robotaxi), which tracks the public Texas DMV Automated Vehicle "
-           "registry (TxDMV TxMCCS). Unofficial and not affiliated with Tesla, TxDMV or fsddb. "
-           "Counts are registered vehicles, not vehicles in service.")
+st.subheader("Service areas")
+st.caption("Cities where Waymo, Tesla, and Zoox publish a service boundary. "
+           "These shapes are context for where vehicles operate. They are not vehicle counts "
+           "and are separate from the Texas registry totals above.")
+areas_doc = load_areas()
+if not areas_doc:
+    st.info("Service-area file is not available yet. The daily collector stores data/service-areas.json.")
+else:
+    geojson, area_rows = feature_collection(areas_doc)
+    area_frame = pd.DataFrame(area_rows)
+    map_args = dict(
+        geojson=geojson, locations="key", featureidkey="properties.key", color="provider",
+        hover_name="city", hover_data={"provider": True, "key": False, "test_region": False},
+        color_discrete_map={"Waymo": "#4DA3FF", "Tesla": RED, "Zoox": "#B388FF"},
+        opacity=0.62, zoom=3.1, center={"lat": 36.2, "lon": -96.5},
+    )
+    try:
+        if hasattr(px, "choropleth_map"):
+            area_fig = px.choropleth_map(area_frame, map_style="carto-darkmatter", **map_args)
+        else:
+            area_fig = px.choropleth_mapbox(area_frame, mapbox_style="carto-darkmatter", **map_args)
+        area_fig.update_layout(margin=dict(l=0, r=0, t=0, b=0), height=560, legend_title=None,
+                               paper_bgcolor="rgba(0,0,0,0)")
+        st.plotly_chart(area_fig, width="stretch")
+    except Exception as exc:
+        st.info(f"Service-area map could not be drawn ({exc}).")
+    st.dataframe(area_frame[["city", "provider"]], hide_index=True)
+    areas_meta = meta.get("service_areas") or {}
+    stamped = areas_meta.get("generated_at") or generated_at(areas_doc) or "unknown"
+    fetched = areas_meta.get("fetched_at") or "not recorded"
+    st.caption(f"Source: [Robotaxi-Tracker service-areas.json](https://github.com/Robotaxi-Tracker/robotaxi-service-areas). "
+               f"File generated {stamped}. Cached by the daily collector {fetched}.")
+
+st.divider()
+st.subheader("California activity")
+st.caption("Quarterly CPUC passenger-service reports, shown by month. "
+           "Trips and vehicle miles are activity, lagged to the filing, not a fleet size. "
+           "They are not added to the Texas vehicle totals.")
+cpuc_doc = load_cpuc()
+if not cpuc_doc:
+    st.info("California activity file is not available yet. The daily collector stores data/cpuc_activity_monthly.json.")
+else:
+    monthly = pd.DataFrame(sum_activity(activity_rows(cpuc_doc), "period", "operator"))
+    quarterly = pd.DataFrame(sum_activity(activity_rows(cpuc_doc), "quarter", "operator"))
+    monthly["period"] = pd.to_datetime(monthly["period"])
+    monthly = monthly.sort_values(["period", "operator"])
+    quarterly = quarterly.sort_values(["quarter", "operator"])
+    latest_quarter = quarterly["quarter"].max()
+    quarter_rows = quarterly[quarterly["quarter"] == latest_quarter].sort_values("trips", ascending=False)
+    cols = st.columns(max(1, len(quarter_rows)))
+    for column, record in zip(cols, quarter_rows.itertuples()):
+        column.metric(f"{record.operator} trips", f"{int(round(record.trips)):,}",
+                      help="Passenger trips in this quarter. Not a vehicle count.")
+    st.caption(f"{latest_quarter}. Separate CPUC programs for the same operator are summed. "
+               "That adds drivered and driverless filings, which are different services.")
+    left, right = st.columns(2)
+    trips = px.line(monthly, x="period", y="trips", color="operator", markers=True)
+    trips.update_layout(yaxis_title="Trips", xaxis_title=None, legend_title=None)
+    trips.update_yaxes(showgrid=False)
+    trips.update_xaxes(showgrid=False)
+    left.plotly_chart(trips, width="stretch")
+    miles = px.line(monthly, x="period", y="vmt", color="operator", markers=True)
+    miles.update_layout(yaxis_title="Vehicle miles", xaxis_title=None, legend_title=None)
+    miles.update_yaxes(showgrid=False)
+    miles.update_xaxes(showgrid=False)
+    right.plotly_chart(miles, width="stretch")
+    table = quarterly.sort_values(["quarter", "operator"], ascending=[False, True]).copy()
+    table["trips"] = table["trips"].round(0).astype(int)
+    table["vmt"] = table["vmt"].round(0).astype(int)
+    st.dataframe(table, hide_index=True)
+    cpuc_meta = meta.get("cpuc_activity") or {}
+    fetched = cpuc_meta.get("fetched_at") or "not recorded"
+    st.caption("Source: California Public Utilities Commission AV Program quarterly deployment reports, "
+               "monthly aggregate from [AV Observatory](https://av-observatory.com/data/cpuc_activity_monthly.json) "
+               f"(public agency data, cited here). Cached by the daily collector {fetched}.")
+
+st.divider()
+st.caption("Texas counts are registered vehicles from the TxDMV TxMCCS list, with operator totals cross-checked "
+           "against [fsddb.com](https://fsddb.com/robotaxi). Unofficial and not affiliated with Tesla, TxDMV, "
+           "fsddb, the CPUC, or AV Observatory. Service areas and California trips are separate feeds.")
