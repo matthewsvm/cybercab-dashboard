@@ -3,26 +3,35 @@
 Streamlit app charting Tesla (Model Y + Cybercab) and other robotaxi operators' registered fleets in Texas.
 
 - `app.py` – Streamlit app (entry point)
-- `data/history.csv` – history. `quality` is `exact` (model split published that day), `carried_forward` (no usable model names, operator total unchanged, previous model counts reused), or `approximate` (tracker-sourced early totals)
-- `scripts/collect.py` – fetches https://fsddb.com/robotaxi.json once, appends today's rows (idempotent per day)
-- `scripts/model_rows.py` – shared model-name rules used by the collector and `app.py` `load()`
-- `.github/workflows/daily.yml` – runs the collector daily and commits the CSV
+- `data/history.csv` – Texas fleet history. `quality` is `exact` (VIN census matched the fleet size, or fsddb published usable model names), `partial` (VIN census matched the fleet size and some VINs did not decode), `carried_forward` (no usable names and the operator total was unchanged), or `approximate` (early tracker totals)
+- `scripts/collect.py` – daily job: fsddb totals, TxMCCS VIN pages, then cached map and California files
+- `scripts/vin_models.py` – VIN prefix table and the one-source model choice
+- `data/service-areas.json` – city boundaries, cached. Not a fleet count
+- `data/cpuc_activity_monthly.json` – California trips and miles, cached. Not a fleet count
+- `.github/workflows/daily.yml` – runs the collector daily and commits those files
 
 ## Data
-Derived from the public Texas DMV Automated Vehicle registry via [fsddb.com](https://fsddb.com/robotaxi). Unofficial. Please be gentle with fsddb: one request per day.
+Three feeds, kept apart. Texas registered vehicles stay the headline. Please be gentle with the upstream sites: the Action sleeps between TxMCCS pages and requests fsddb once.
 
-`scripts/collect.py` stores `operators[].fleet_size` as `operator_total` and writes one row per usable `operators[].models` entry. Placeholder names (`Unknown model`, blank, `n/a`, `none`, `null`) are not stored as vehicles. The same rules run in `app.py` `load()`, so a placeholder row already in the CSV is not charted as a model.
+| Feed | What it contributes |
+| --- | --- |
+| TxDMV TxMCCS VIN list | Per-model counts. Prefixes such as `7SAY` Model Y and `5YJA` Cybercab. |
+| [fsddb.com/robotaxi.json](https://fsddb.com/robotaxi) | Operator totals (`fleet_size`). Its `models` map is currently `Unknown model`, so those names are not used. |
+| [Robotaxi-Tracker service areas](https://github.com/Robotaxi-Tracker/robotaxi-service-areas) | City polygons for the map. |
+| [AV Observatory CPUC monthly file](https://av-observatory.com/data/cpuc_activity_monthly.json) | California trips and vehicle miles from CPUC quarterly reports. |
 
-When an operator has no usable model name:
+A model row comes from the VIN census when the number of unique VINs equals that operator's fsddb `fleet_size`. fsddb model counts are not added on top. If TxMCCS fails or the totals disagree, names fall back as follows:
 
-- If `fleet_size` equals that operator's previous snapshot total, the previous model rows are copied onto that day with the same counts and `quality` `carried_forward`.
+- If `fleet_size` equals that operator's previous snapshot total, the previous model rows are copied and marked `carried_forward`.
 - If the total changed, or there is no previous snapshot, one `(all models)` row is written with `count` equal to `fleet_size`.
 
 Only the immediately previous snapshot is consulted. After a total change, a later day that returns to an older total does not reuse the pre-change mix.
 
+The same fallback runs in `app.py` `load()`. California rows and map polygons never enter `history.csv`.
+
 ### 2026-11-05
 
-[Run 42096654111](https://github.com/matthewsvm/cybercab-dashboard/actions/runs/42096654111) stored fsddb's placeholder: every operator was `{"Unknown model": <fleet_size>}`. Those fleet sizes matched 2026-11-04 (Waymo 1,259, Tesla Robotaxi 1,244, Avride 344, Zoox 63, Nuro 47, May Mobility 22), so the placeholder rows were replaced with that day's model counts. Tesla Robotaxi on 2026-11-05 is Model Y 671 and Cybercab 573, marked `carried_forward`. Operator totals are still the source fleet sizes.
+[Run 42096654111](https://github.com/matthewsvm/cybercab-dashboard/actions/runs/42096654111) stored fsddb's placeholder. Those fleet sizes matched 2026-11-04, so Tesla Robotaxi that day is Model Y 671 and Cybercab 573, marked `carried_forward`. Later days with a changed total use the VIN census when it matches.
 
 ## Deploy
 1. Push these files to the repo's `main` branch.
