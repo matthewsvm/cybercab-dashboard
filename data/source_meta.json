@@ -3,13 +3,13 @@
     "source": "https://raw.githubusercontent.com/Robotaxi-Tracker/robotaxi-service-areas/main/dist/service-areas.json",
     "generated_at": "2026-09-10T22:07:02.706Z",
     "areas": 23,
-    "fetched_at": "2026-11-14T14:14:59+00:00"
+    "fetched_at": "2026-11-14T19:11:14+00:00"
   },
   "cpuc_activity": {
     "source": "https://av-observatory.com/data/cpuc_activity_monthly.json",
     "upstream": "California Public Utilities Commission (CPUC) AV Program quarterly deployment reports",
     "dataset": "California AV Deployment Activity (Monthly)",
     "rows": 101,
-    "fetched_at": "2026-11-14T14:14:59+00:00"
+    "fetched_at": "2026-11-14T19:11:14+00:00"
   }
 }
