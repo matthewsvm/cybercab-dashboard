@@ -361,3 +361,13 @@ date,operator,model,count,operator_total,source,quality
 2026-11-13,Nuro,Lucid Gravity,26,47,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
 2026-11-13,Nuro,Toyota Prius,21,47,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
 2026-11-13,May Mobility,Toyota Sienna,22,22,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
+2026-11-14,Waymo,Jaguar I-PACE,874,1321,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
+2026-11-14,Waymo,Zeekr RT,447,1321,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
+2026-11-14,Tesla Robotaxi,Model Y,730,1303,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
+2026-11-14,Tesla Robotaxi,Cybercab,573,1303,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
+2026-11-14,Avride,Hyundai Ioniq 5,344,344,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
+2026-11-14,Zoox,Toyota Highlander,46,63,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
+2026-11-14,Zoox,Zoox,17,63,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
+2026-11-14,Nuro,Lucid Gravity,26,47,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
+2026-11-14,Nuro,Toyota Prius,21,47,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
+2026-11-14,May Mobility,Toyota Sienna,22,22,TxDMV TxMCCS VIN prefixes; fleet_size cross-check fsddb.com/robotaxi.json,exact
